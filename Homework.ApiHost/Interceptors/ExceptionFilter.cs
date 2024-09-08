@@ -54,7 +54,8 @@ namespace Homework.ApiHost.Interceptors
                 result.StatusCode = (int)HttpStatusCode.InternalServerError;
             }
             
-            context.ExceptionHandled = true; //Exception Handled flag
+            context.Result = result;
+            context.ExceptionHandled = true;
         }
     }
 }
