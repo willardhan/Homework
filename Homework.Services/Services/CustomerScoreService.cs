@@ -29,7 +29,7 @@ namespace Homework.Services.Services
         /// fast query: rank in leader board 
         /// </summary>
         private static Dictionary<int, int> RankDictionary = new();
-        private ReaderWriterLockSlim _rwLock = new ReaderWriterLockSlim();
+        private static ReaderWriterLockSlim _rwLock = new();
 
         public CustomerScoreService()
         {
