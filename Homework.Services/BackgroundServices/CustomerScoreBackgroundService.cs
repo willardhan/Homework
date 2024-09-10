@@ -20,6 +20,11 @@ namespace Homework.Services.BackgroundServices
                 //wait to loop
                 await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken);
             }  
+            
+            LeaderboardDataHelper.Leaderboards.Clear();
+            LeaderboardDataHelper.ScoreDictionary.Clear();
+            LeaderboardDataHelper.RankDictionary.Clear();
+            LeaderboardDataHelper.UpdateQueue.Clear();
         }
 
         public static void UpdateCustomerScore()
