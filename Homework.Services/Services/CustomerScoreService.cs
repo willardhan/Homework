@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using Homework.Infrastructure.Attributes;
 using Homework.Infrastructure.ComponentModels;
 using Homework.Infrastructure.Exceptions;
@@ -15,22 +14,6 @@ namespace Homework.Services.Services
     [Service(ServiceLifetime.Scoped)]
     public class CustomerScoreService: ICustomerScoreService
     {
-        /// <summary>
-        /// sort leader board
-        /// </summary>
-        private static SortedSet<Leaderboard> Leaderboards = new(new CustomerScoreComparer());
-        /// <summary>
-        /// customer and score dictionary
-        /// fast query: score by customer id
-        /// </summary>
-        private static Dictionary<int, decimal> ScoreDictionary = new();
-        /// <summary>
-        /// customer and rank dictionary
-        /// fast query: rank in leader board 
-        /// </summary>
-        private static Dictionary<int, int> RankDictionary = new();
-        private static ReaderWriterLockSlim _rwLock = new();
-
         public CustomerScoreService()
         {
         }
@@ -43,53 +26,12 @@ namespace Homework.Services.Services
         /// <returns>if succeed</returns>
         public bool AddOrUpdateScore(int customerId, decimal score)
         {
-            var result = false;
-            var needUpdateIndex = true;
-
             if (score < -1000 || score > 1000)
                 throw new ValidationLevelException(GlobalParameter.AddOrUpdateScoreInputInvalidMsg);
             
-            _rwLock.EnterWriteLock();  
-            try  
-            {  
-                if (ScoreDictionary.ContainsKey(customerId)) // do update
-                {
-                    // need to do whether update or remove in leader board 
-                    Leaderboards.RemoveWhere(entry => entry.CustomerId == customerId);
-                    var oldScore = ScoreDictionary[customerId];
-                    var newScore = oldScore + score;
-                    if (newScore > 0) // update when score is greater than zero
-                    {
-                        ScoreDictionary[customerId] = newScore;
-                        result = Leaderboards.Add(new Leaderboard(customerId, newScore));
-                    }
-                    else // remove when score is not greater than zero
-                    {
-                        ScoreDictionary.Remove(customerId, out _);
-                    }
-                }
-                else if(score > 0) // do add
-                {
-                    ScoreDictionary.Add(customerId, score);
-                    result = Leaderboards.Add(new Leaderboard(customerId, score));
-                }
-                else // do noting
-                {
-                    needUpdateIndex = false;
-                }
+            LeaderboardDataHelper.UpdateQueue.Enqueue(new Leaderboard(customerId, score));
 
-                if (needUpdateIndex) // rebuild customer and rank dictionary
-                {
-                    RankDictionary = Leaderboards.Select((m, i) => new {CustomerId = m.CustomerId, Index = i})
-                        .ToDictionary(m => m.CustomerId, n => n.Index);
-                }
-            }  
-            finally  
-            {  
-                _rwLock.ExitWriteLock();  
-            }  
-
-            return result;
+            return true;
         }
 
         /// <summary>
@@ -104,12 +46,13 @@ namespace Homework.Services.Services
             if (start <= 0) start = 1;
             if (start > end) return result;
 
-            _rwLock.EnterReadLock();  
+            LeaderboardDataHelper.RwLock.EnterReadLock();  
             try  
             {  
                 var skipCount = start - 1;
                 var takeCount = end - start + 1;
-                var items = Leaderboards.Skip(skipCount).Take(takeCount).ToList();
+                
+                var items = LeaderboardDataHelper.Leaderboards.Skip(skipCount).Take(takeCount).ToList();
                 if (items.HasElement())
                 {
                     result = items.Select((m, i) => new CustomerScoreDto
@@ -122,7 +65,7 @@ namespace Homework.Services.Services
             }  
             finally  
             {  
-                _rwLock.ExitReadLock();  
+                LeaderboardDataHelper.RwLock.ExitReadLock();  
             }
 
             return result;
@@ -145,15 +88,15 @@ namespace Homework.Services.Services
             if (startIndex < 0) startIndex = 0;
             if (endIndex < 0) endIndex = 0;
 
-            _rwLock.EnterReadLock();  
+            LeaderboardDataHelper.RwLock.EnterReadLock();  
             try  
             {  
-                if (!RankDictionary.ContainsKey(customerId)) return result;
+                if (!LeaderboardDataHelper.RankDictionary.ContainsKey(customerId)) return result;
 
-                var customerIndex = RankDictionary[customerId]; 
+                var customerIndex = LeaderboardDataHelper.RankDictionary[customerId]; 
                 var skipCount = Math.Max(customerIndex - startIndex , 0);
                 var takeCount = endIndex + customerIndex + 1 - skipCount;
-                var items = Leaderboards.Skip(skipCount).Take(takeCount).ToList();
+                var items = LeaderboardDataHelper.Leaderboards.Skip(skipCount).Take(takeCount).ToList();
                 if (items.HasElement())
                 {
                     result = items.Select((m, i) => new CustomerScoreDto
@@ -166,7 +109,7 @@ namespace Homework.Services.Services
             }  
             finally  
             {  
-                _rwLock.ExitReadLock();  
+                LeaderboardDataHelper.RwLock.ExitReadLock();  
             }  
 
             return result;
@@ -177,10 +120,11 @@ namespace Homework.Services.Services
         /// </summary>
         public SortedSet<Leaderboard> GetClearLeaderboards()
         {
-            Leaderboards.Clear();
-            ScoreDictionary.Clear();
-            RankDictionary.Clear();
-            return Leaderboards;
+            LeaderboardDataHelper.Leaderboards.Clear();
+            LeaderboardDataHelper.ScoreDictionary.Clear();
+            LeaderboardDataHelper.RankDictionary.Clear();
+            LeaderboardDataHelper.UpdateQueue.Clear();
+            return LeaderboardDataHelper.Leaderboards;
         }
     }
 }

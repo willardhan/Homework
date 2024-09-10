@@ -6,6 +6,7 @@ using Homework.ApiHost.Interceptors;
 using Homework.Infrastructure.Attributes;
 using Homework.Infrastructure.Exceptions;
 using Homework.Infrastructure.Extensions;
+using Homework.Services.BackgroundServices;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -28,6 +29,7 @@ namespace Homework.ApiHost
             services.AddControllers(options => { options.Filters.Add<ExceptionFilter>(); }).AddControllersAsServices();
             services.AddFluentValidationExceptionHandler();
             services.AddCustomServices();
+            services.AddHostedService<CustomerScoreBackgroundService>(); 
         }
         
         public void Configure(IApplicationBuilder app, IServiceProvider serviceProvider)

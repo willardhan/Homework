@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Homework.Infrastructure.ComponentModels;
+using Homework.Services.BackgroundServices;
 using Homework.Services.IServices;
 using Xunit;
 using Xunit.Abstractions;
@@ -43,6 +44,7 @@ namespace Homework.UnitTest.CustomerScore
 
             //Act
             _customerScoreService.AddOrUpdateScore(customerId, score);
+            CustomerScoreBackgroundService.UpdateCustomerScore();
             
             // Assert
             Assert.Equal(1, leaderboards.Count);
@@ -76,6 +78,7 @@ namespace Homework.UnitTest.CustomerScore
             {
                 //Act
                 _customerScoreService.AddOrUpdateScore(customerId, score);
+                CustomerScoreBackgroundService.UpdateCustomerScore();
             }
             catch (Exception e)
             {
@@ -114,6 +117,7 @@ namespace Homework.UnitTest.CustomerScore
 
             //Act
             _customerScoreService.AddOrUpdateScore(customerId, score);
+            CustomerScoreBackgroundService.UpdateCustomerScore();
             
             // Assert
             Assert.Equal(2, leaderboards.Count);
@@ -145,11 +149,13 @@ namespace Homework.UnitTest.CustomerScore
             // Arrange
             var leaderboards = _customerScoreService.GetClearLeaderboards();
             _customerScoreService.AddOrUpdateScore(2, 1);
+            CustomerScoreBackgroundService.UpdateCustomerScore();
 
             try
             {
                 //Act
                 _customerScoreService.AddOrUpdateScore(customerId, score);
+                CustomerScoreBackgroundService.UpdateCustomerScore();
             }
             catch (Exception e)
             {
@@ -186,6 +192,7 @@ namespace Homework.UnitTest.CustomerScore
 
             //Act
             _customerScoreService.AddOrUpdateScore(customerId, updateScore1);
+            CustomerScoreBackgroundService.UpdateCustomerScore();
             var item = leaderboards.FirstOrDefault(m => m.CustomerId == customerId);
             // Assert
             Assert.NotNull(item);
@@ -196,6 +203,7 @@ namespace Homework.UnitTest.CustomerScore
             
             //Act
             _customerScoreService.AddOrUpdateScore(customerId, updateScore2);
+            CustomerScoreBackgroundService.UpdateCustomerScore();
             item = leaderboards.FirstOrDefault(m => m.CustomerId == customerId);
             // Assert
             Assert.NotNull(item);
@@ -206,6 +214,7 @@ namespace Homework.UnitTest.CustomerScore
             
             //Act
             _customerScoreService.AddOrUpdateScore(customerId, updateScore3);
+            CustomerScoreBackgroundService.UpdateCustomerScore();
             item = leaderboards.FirstOrDefault(m => m.CustomerId == customerId);
             // Assert
             Assert.NotNull(item);
@@ -216,6 +225,7 @@ namespace Homework.UnitTest.CustomerScore
             
             //Act
             _customerScoreService.AddOrUpdateScore(customerId, updateScore4);
+            CustomerScoreBackgroundService.UpdateCustomerScore();
             item = leaderboards.FirstOrDefault(m => m.CustomerId == customerId);
             // Assert
             Assert.NotNull(item);
@@ -226,6 +236,7 @@ namespace Homework.UnitTest.CustomerScore
             
             //Act
             _customerScoreService.AddOrUpdateScore(customerId, updateScore5);
+            CustomerScoreBackgroundService.UpdateCustomerScore();
             item = leaderboards.FirstOrDefault(m => m.CustomerId == customerId);
             // Assert
             Assert.NotNull(item);
@@ -236,6 +247,7 @@ namespace Homework.UnitTest.CustomerScore
             
             //Act
             _customerScoreService.AddOrUpdateScore(customerId, updateScore6);
+            CustomerScoreBackgroundService.UpdateCustomerScore();
             item = leaderboards.FirstOrDefault(m => m.CustomerId == customerId);
             // Assert
             Assert.NotNull(item);
@@ -246,6 +258,7 @@ namespace Homework.UnitTest.CustomerScore
             
             //Act
             _customerScoreService.AddOrUpdateScore(customerId, updateScore7);
+            CustomerScoreBackgroundService.UpdateCustomerScore();
             item = leaderboards.FirstOrDefault(m => m.CustomerId == customerId);
             // Assert
             Assert.NotNull(item);
@@ -255,6 +268,7 @@ namespace Homework.UnitTest.CustomerScore
             
             //Act
             _customerScoreService.AddOrUpdateScore(customerId, updateScore8);
+            CustomerScoreBackgroundService.UpdateCustomerScore();
             item = leaderboards.FirstOrDefault(m => m.CustomerId == customerId);
             // Assert
             Assert.Null(item);
@@ -283,6 +297,7 @@ namespace Homework.UnitTest.CustomerScore
             {
                 _customerScoreService.AddOrUpdateScore(pair.Key, pair.Value);
             }
+            CustomerScoreBackgroundService.UpdateCustomerScore();
 
             //Act
             var items = _customerScoreService.GetCustomerScoreDataByRange(1, 10);
@@ -353,6 +368,7 @@ namespace Homework.UnitTest.CustomerScore
             {
                 _customerScoreService.AddOrUpdateScore(pair.Key, pair.Value);
             }
+            CustomerScoreBackgroundService.UpdateCustomerScore();
 
             //Act
             var items = _customerScoreService.GetCustomerScoreDataByRange(2, 6);
@@ -413,6 +429,7 @@ namespace Homework.UnitTest.CustomerScore
             {
                 _customerScoreService.AddOrUpdateScore(pair.Key, pair.Value);
             }
+            CustomerScoreBackgroundService.UpdateCustomerScore();
 
             //Act
             var items = _customerScoreService.GetCustomerScoreDataByRange(-10, 3);
@@ -478,6 +495,7 @@ namespace Homework.UnitTest.CustomerScore
             {
                 _customerScoreService.AddOrUpdateScore(pair.Key, pair.Value);
             }
+            CustomerScoreBackgroundService.UpdateCustomerScore();
 
             //Act
             var items = _customerScoreService.GetCustomerScoreDataByRange(5, 3);
@@ -515,6 +533,7 @@ namespace Homework.UnitTest.CustomerScore
             {
                 _customerScoreService.AddOrUpdateScore(pair.Key, pair.Value);
             }
+            CustomerScoreBackgroundService.UpdateCustomerScore();
 
             //Act
             var items = _customerScoreService.GetCustomerScoreDataByCustomerAndRange(10009);
@@ -558,6 +577,7 @@ namespace Homework.UnitTest.CustomerScore
             {
                 _customerScoreService.AddOrUpdateScore(pair.Key, pair.Value);
             }
+            CustomerScoreBackgroundService.UpdateCustomerScore();
 
             //Act
             var items = _customerScoreService.GetCustomerScoreDataByCustomerAndRange(10001, 2);
@@ -600,6 +620,7 @@ namespace Homework.UnitTest.CustomerScore
             {
                 _customerScoreService.AddOrUpdateScore(pair.Key, pair.Value);
             }
+            CustomerScoreBackgroundService.UpdateCustomerScore();
 
             //Act
             var items = _customerScoreService.GetCustomerScoreDataByCustomerAndRange(10001, 10);
@@ -665,6 +686,7 @@ namespace Homework.UnitTest.CustomerScore
             {
                 _customerScoreService.AddOrUpdateScore(pair.Key, pair.Value);
             }
+            CustomerScoreBackgroundService.UpdateCustomerScore();
 
             //Act
             var items = _customerScoreService.GetCustomerScoreDataByCustomerAndRange(10001, end: 2);
@@ -707,6 +729,7 @@ namespace Homework.UnitTest.CustomerScore
             {
                 _customerScoreService.AddOrUpdateScore(pair.Key, pair.Value);
             }
+            CustomerScoreBackgroundService.UpdateCustomerScore();
 
             //Act
             var items = _customerScoreService.GetCustomerScoreDataByCustomerAndRange(10001, end: 10);
@@ -768,6 +791,7 @@ namespace Homework.UnitTest.CustomerScore
             {
                 _customerScoreService.AddOrUpdateScore(pair.Key, pair.Value);
             }
+            CustomerScoreBackgroundService.UpdateCustomerScore();
 
             //Act
             var items = _customerScoreService.GetCustomerScoreDataByCustomerAndRange(10001, 2, 2);
@@ -818,6 +842,7 @@ namespace Homework.UnitTest.CustomerScore
             {
                 _customerScoreService.AddOrUpdateScore(pair.Key, pair.Value);
             }
+            CustomerScoreBackgroundService.UpdateCustomerScore();
 
             //Act
             var items = _customerScoreService.GetCustomerScoreDataByCustomerAndRange(10001, 10, 2);
